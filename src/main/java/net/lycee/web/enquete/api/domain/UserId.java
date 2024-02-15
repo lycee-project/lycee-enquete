@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import org.springframework.web.bind.WebDataBinder;
 
 public record UserId(
-        //@JsonValue
+        @JsonValue
         String value
 ) {
     public static void register(WebDataBinder binder) {
