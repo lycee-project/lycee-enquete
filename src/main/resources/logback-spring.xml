@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+
+    <!-- 共通フォーマット(LTSV形式) -->
+    <property name="FORMAT" value="marker:%X{marker}\tlevel:%le\ttime:%d{yyyy-MM-dd HH:mm:ss.SSS}\tlogger:%lo{36}\trequest_id:%X{requestId}\tmethod:%X{method}\trequest:%X{requestUri}\tuser_id:%X{userId}\tspace_id:%X{qesSpaceId}\t%msg%n" />
+    <!-- 共通出力先 -->
+    <property name="LOG_DIR" value="logs" />
+
+    <!-- プロファイルごとの切り替え設定 -->
+    <springProfile name="stg">
+        <include resource="config/logback/layout-stg.xml" />
+    </springProfile>
+
+    <springProfile name="prod">
+        <include resource="config/logback/layout-prod.xml" />
+    </springProfile>
+
+    <springProfile name="default | local">
+        <include resource="config/logback/layout-local.xml" />
+    </springProfile>
+</configuration>

@@ -1,0 +1,15 @@
+spring:
+  profiles:
+    group:
+      local:
+        - common
+        - local
+      test:
+        - local
+        - test
+      stg:
+        - common
+        - stg
+      prod:
+        - common
+        - prod
