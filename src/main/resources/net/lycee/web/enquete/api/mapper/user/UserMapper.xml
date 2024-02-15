@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.lycee.web.enquete.api.mapper.user.UserMapper">
+
+    <insert id="insert">
+        INSERT INTO QES_USER
+        (
+            USER_ID
+        )
+        VALUES(
+            #{userId}
+        )
+    </insert>
+
+    <select id="search">
+        SELECT
+            USER_ID
+        FROM
+            QES_USER
+        WHERE
+            USER_ID = #{userId}
+    </select>
+
+    <insert id="insertJoin">
+        INSERT INTO QES_USER_JOIN
+        (
+            USER_ID,
+            SPACE_ID
+        ) VALUES (
+            #{userId},
+            #{spaceId}
+        )
+
+
+    </insert>
+
+</mapper>
