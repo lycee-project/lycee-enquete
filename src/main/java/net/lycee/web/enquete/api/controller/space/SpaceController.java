@@ -56,7 +56,13 @@ public class SpaceController {
         var info = spaceService.readOne(requestUser.getUserId(), spaceId);
 
         return ResponseEntity.ok(
-                new SpaceGetOneResponse(info)
+                new SpaceGetOneResponse(
+                        info.id(),
+                        info.ownerId(),
+                        info.name(),
+                        info.openedTime(),
+                        info.closeTime()
+                )
         );
     }
 
@@ -67,7 +73,7 @@ public class SpaceController {
      * @return スペースID
      */
     @PostMapping
-    public ResponseEntity<SpaceId> handlePost(
+    public ResponseEntity<SpacePostResponse> handlePost(
             @RequestBody @Validated SpacePostRequest request
     ) {
         SpaceRegisterDto registerDto = new SpaceRegisterDto(
@@ -78,7 +84,9 @@ public class SpaceController {
 
         SpaceId spaceId = spaceService.register(registerDto);
 
-        return ResponseEntity.ok(spaceId);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new SpacePostResponse(spaceId));
     }
 
     /**

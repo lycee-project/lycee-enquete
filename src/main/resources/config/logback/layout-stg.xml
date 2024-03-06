@@ -3,7 +3,7 @@
     <appender name="SYSTEM_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_DIR}/stg/system.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_DIR}/stg/system.log.%d{yyyy-MM-dd}.tar.gz</fileNamePattern>
+            <fileNamePattern>${LOG_DIR}/stg/system.log.%d{yyyyMMdd}.tar.gz</fileNamePattern>
             <maxHistory>7</maxHistory>
         </rollingPolicy>
         <encoder>

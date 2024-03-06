@@ -9,6 +9,12 @@ import java.util.function.Supplier;
 
 public class LyceeDate implements Supplier<LocalDateTime> {
 
+    private final ZoneOffset zoneOffset;
+
+    public LyceeDate(ZoneOffset zoneOffset) {
+        this.zoneOffset = zoneOffset;
+    }
+
     @Override
     public LocalDateTime get() {
         return (LocalDateTime) RequestContextHolder
@@ -17,7 +23,8 @@ public class LyceeDate implements Supplier<LocalDateTime> {
     }
 
     public long getMilliseconds() {
-        return get().toEpochSecond(ZoneOffset.ofHours(9));
+        return get().toInstant(zoneOffset).toEpochMilli();
+        //return get().toEpochSecond(ZoneOffset.ofHours(9));
     }
 
 }

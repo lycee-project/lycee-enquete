@@ -1,5 +1,6 @@
 package net.lycee.web.enquete.utils;
 
+import net.lycee.web.enquete.api.domain.AnswerId;
 import net.lycee.web.enquete.api.domain.QuestionId;
 import net.lycee.web.enquete.api.domain.SpaceId;
 import net.lycee.web.enquete.api.domain.UserId;
@@ -28,6 +29,11 @@ public class IdUtils {
     public QuestionId publishQuestionId() {
         String id = issueIdInternal();
         return new QuestionId(id);
+    }
+
+    public AnswerId publishAnswerId() {
+        String id = issueIdInternal();
+        return new AnswerId(id);
     }
 
 }

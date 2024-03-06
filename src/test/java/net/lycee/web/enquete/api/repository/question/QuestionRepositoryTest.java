@@ -1,5 +1,6 @@
 package net.lycee.web.enquete.api.repository.question;
 
+import net.lycee.web.enquete.api.domain.UserId;
 import net.lycee.web.enquete.utils.date.LyceeFixedDate;
 import net.lycee.web.enquete.api.domain.SpaceId;
 import org.junit.jupiter.api.Nested;
@@ -27,6 +28,7 @@ public class QuestionRepositoryTest {
         public void test_invalidSpace() {
 
             target.readQuestions(
+                    new UserId("01234567-abcd-abcd-abcd-user00000001"),
                     new SpaceId("01234567-abcd-abcd-abcd-space0000001"),
                     new LyceeFixedDate("2024-03-01 14:00:01")
             );

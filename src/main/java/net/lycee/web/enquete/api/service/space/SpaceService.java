@@ -5,6 +5,7 @@ import net.lycee.web.enquete.api.controller.space.SpaceInfo;
 import net.lycee.web.enquete.api.entity.SpaceEntity;
 import net.lycee.web.enquete.api.repository.space.SpaceRepository;
 import net.lycee.web.enquete.exception.NotJoinException;
+import net.lycee.web.enquete.exception.QesRuntimeException;
 import net.lycee.web.enquete.utils.IdUtils;
 import net.lycee.web.enquete.utils.LyceeConstants;
 import net.lycee.web.enquete.utils.date.LyceeDate;
@@ -12,6 +13,7 @@ import net.lycee.web.enquete.api.domain.SpaceId;
 import net.lycee.web.enquete.api.domain.UserId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -57,13 +59,13 @@ public class SpaceService {
 
     public List<SpaceInfo> readAll(UserId userId) {
         return spaceRepository.read(userId, null)
-                .stream().map(e ->
+                .stream().map(it ->
                         new SpaceInfo(
-                                e.getId(),
-                                e.getOwnerId(),
-                                e.getName(),
-                                e.getOpenedTime(),
-                                e.getCloseTime()
+                                it.getId(),
+                                it.getOwnerId(),
+                                it.getName(),
+                                it.getOpenedTime(),
+                                it.getCloseTime()
                         )
                 )
                 .toList();
@@ -112,5 +114,17 @@ public class SpaceService {
         spaceRepository.join(registerDto.userId(), spaceId);
 
         return spaceId;
+    }
+
+    public void validateOwner(UserId userId, SpaceId spaceId) {
+        SpaceInfo space = readOne(userId, spaceId);
+
+        if (!space.ownerId().equals(userId)) {
+            throw new QesRuntimeException(
+                    HttpStatus.FORBIDDEN,
+                    "スペースオーナーではありません"
+            );
+        }
+
     }
 }

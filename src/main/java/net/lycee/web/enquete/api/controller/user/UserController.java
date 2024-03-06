@@ -32,20 +32,19 @@ public class UserController {
      * ユーザ情報取得API
      * @return ユーザ情報
      */
-    @GetMapping("/")
-    public ResponseEntity<UserInfo>
+    @GetMapping("")
+    public ResponseEntity<UserGetResponse>
     handleRead() {
         UserInfo userInfo = userService.readUserInfo(user.getUserId());
 
-        return ResponseEntity.ok(userInfo);
+        return ResponseEntity.ok(new UserGetResponse(userInfo.userId()));
     }
-
 
     /**
      * ユーザID発行API
      * @return ユーザID
      */
-    @PutMapping("/")
+    @PostMapping("")
     @LyceeAnonymous
     public ResponseEntity<UserRegisterResponse>
     handleRegister() {

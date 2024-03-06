@@ -21,7 +21,7 @@ public class SpaceRepositoryImpl implements SpaceRepository {
 
     @Override
     public List<SpaceEntity> read(UserId userId, SpaceId spaceId) {
-        return spaceMapper.selectByUser(userId.value(),
+        return spaceMapper.selectByUser(userId,
                 spaceId);
     }
 

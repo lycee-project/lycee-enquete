@@ -1,18 +1,23 @@
 package net.lycee.web.enquete.config;
 
+import net.lycee.web.enquete.interceptor.LyceeApiKeyInterceptor;
+import net.lycee.web.enquete.interceptor.LyceeAuthzInterceptor;
 import net.lycee.web.enquete.interceptor.LyceeLogInterceptor;
 import net.lycee.web.enquete.interceptor.LyceeTimeInterceptor;
-import net.lycee.web.enquete.interceptor.LyceeAuthzInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class QesWebConfig implements WebMvcConfigurer {
+public class WebConfig implements WebMvcConfigurer {
 
     @Autowired
-    private LyceeAuthzInterceptor qesAuthzInterceptor;
+    private LyceeApiKeyInterceptor lyceeApiKeyInterceptor;
+
+    @Autowired
+    private LyceeAuthzInterceptor lyceeAuthzInterceptor;
 
     @Autowired
     private LyceeTimeInterceptor lyceeTimeInterceptor;
@@ -23,11 +28,20 @@ public class QesWebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(lyceeApiKeyInterceptor)
+                .addPathPatterns("/api/**");
         registry.addInterceptor(lyceeLogInterceptor)
                 .addPathPatterns("/api/**");
         registry.addInterceptor(lyceeTimeInterceptor)
                 .addPathPatterns("/api/**");
-        registry.addInterceptor(qesAuthzInterceptor)
+        registry.addInterceptor(lyceeAuthzInterceptor)
                 .addPathPatterns("/api/**");
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedMethods("*")
+                .allowedHeaders("*");
     }
 }

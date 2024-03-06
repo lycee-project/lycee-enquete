@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.lycee.web.enquete.api.mapper.question.AnswerHistoryMapper">
+
+    <insert id="insert">
+        INSERT INTO QES_ANSWER_HISTORY (
+            USER_ID,
+            QUESTION_ID,
+            ANSWER_ID
+        ) VALUES (
+            #{record.userId},
+            #{record.questionId},
+            #{record.answerId}
+        )
+    </insert>
+
+    <resultMap
+            id="summaryResult"
+            type="net.lycee.web.enquete.api.repository.question.AnswerSummaryEntity">
+        <id column="QUESTION_ID" jdbcType="VARCHAR" property="questionId" />
+
+        <collection property="answers" javaType="list" ofType="net.lycee.web.enquete.api.repository.question.AnswerSummary">
+            <id column="ANSWER_ID" jdbcType="VARCHAR" property="answerId" />
+            <result column="COUNTS" jdbcType="INTEGER" property="counts" />
+        </collection>
+    </resultMap>
+    <select id="summaryBySpaceId" resultMap="summaryResult">
+        SELECT
+            QA.QUESTION_ID,
+            QA.ANSWER_ID,
+            COUNT(QAH.USER_ID) AS COUNTS
+        FROM
+            QES_ANSWER QA
+        INNER JOIN
+            QES_QUESTION QQ
+        ON
+            QA.QUESTION_ID = QQ.QUESTION_ID
+        LEFT OUTER JOIN
+            QES_ANSWER_HISTORY QAH
+        ON
+            QAH.QUESTION_ID = QA.QUESTION_ID
+            AND QAH.ANSWER_ID = QA.ANSWER_ID
+        WHERE
+            QQ.SPACE_ID = #{spaceId}
+        GROUP BY
+            QA.QUESTION_ID,
+            QA.ANSWER_ID
+    </select>
+
+    <select id="selectByUserIdJoined" resultType="net.lycee.web.enquete.api.mapper.AnswerHistoryRecord">
+        SELECT
+            QAH.USER_ID,
+            QAH.QUESTION_ID,
+            QAH.ANSWER_ID
+        FROM
+            QES_ANSWER_HISTORY QAH
+        INNER JOIN
+            QES_QUESTION QQ
+        ON
+            QQ.QUESTION_ID = QAH.QUESTION_ID
+        INNER JOIN
+            QES_USER_JOIN QUJ
+        ON
+            QUJ.SPACE_ID = QQ.SPACE_ID
+        AND
+            QUJ.USER_ID = QAH.USER_ID
+        WHERE
+            QAH.USER_ID = #{userId}
+        AND
+            QUJ.SPACE_ID = #{spaceId}
+    </select>
+
+</mapper>

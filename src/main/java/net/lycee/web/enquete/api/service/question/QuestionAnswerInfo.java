@@ -5,6 +5,7 @@ import net.lycee.web.enquete.api.domain.AnswerId;
 public record QuestionAnswerInfo(
         AnswerId answerId,
         Integer no,
-        String description
+        String description,
+        Boolean isAnswered
 ) {
 }

@@ -11,15 +11,15 @@
         <result column="QUESTION_NO" jdbcType="INTEGER" property="no" />
         <result column="TYPE" jdbcType="INTEGER" property="type" />
         <result column="DESCRIPTION" jdbcType="VARCHAR" property="description" />
-        <result column="END_TIME" jdbcType="BIGINT" property="closeTime" />
+        <result column="END_TIME" jdbcType="BIGINT" property="endTime" />
+
         <collection property="answers" ofType="net.lycee.web.enquete.api.entity.AnswerEntity" javaType="list">
             <id column="ANSWER_ID" jdbcType="VARCHAR" property="answerId" />
             <result column="ANSWER_NO" jdbcType="INTEGER" property="no" />
             <result column="ANSWER_DESCRIPTION" jdbcType="VARCHAR" property="description" />
+            <result column="IS_ANSWERED" jdbcType="BOOLEAN" property="isAnswered" />
         </collection>
     </resultMap>
-
-
     <select id="readQuestions" resultMap="questionEntity">
         SELECT
             QQ.QUESTION_ID,
@@ -32,15 +32,78 @@
             -- answers
             QA.ANSWER_ID,
             QA.ANSWER_NO,
-            QA.DESCRIPTION AS ANSWER_DESCRIPTION
+            QA.DESCRIPTION AS ANSWER_DESCRIPTION,
+            (QAH.ANSWER_ID IS NOT NULL) AS IS_ANSWERED
         FROM
             QES_QUESTION QQ
         INNER JOIN
             QES_ANSWER QA
         ON
             QQ.QUESTION_ID = QA.QUESTION_ID
+        LEFT OUTER JOIN
+        (
+            SELECT
+                T.*
+            FROM
+                QES_ANSWER_HISTORY T
+            WHERE
+                T.USER_ID = #{userId}
+        ) QAH
+        ON
+            QAH.QUESTION_ID = QA.QUESTION_ID
+        AND
+            QAH.ANSWER_ID = QA.ANSWER_ID
         WHERE
             QQ.SPACE_ID = #{spaceId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO QES_QUESTION (
+            SPACE_ID,
+            QUESTION_ID,
+            QUESTION_NO,
+            TYPE,
+            DESCRIPTION,
+            END_TIME
+        ) VALUES (
+            #{record.spaceId},
+            #{record.questionId},
+            (
+                SELECT
+                    1 + COALESCE(MAX(Q.QUESTION_NO), 0)
+                FROM
+                    QES_QUESTION Q
+                WHERE
+                    Q.SPACE_ID = #{record.spaceId}
+            ),
+            #{record.type},
+            #{record.description},
+            #{record.endTime}
+        )
+    </insert>
+
+    <select id="checkQuestion">
+        SELECT
+            QQ.SPACE_ID,
+            QQ.QUESTION_ID
+        FROM
+            QES_QUESTION QQ
+        INNER JOIN
+            QES_SPACE QS
+        ON
+            QS.SPACE_ID = QQ.SPACE_ID
+        INNER JOIN
+            QES_USER_JOIN QUJ
+        ON
+            QUJ.SPACE_ID = QQ.SPACE_ID
+        WHERE
+            QQ.QUESTION_ID = #{questionId}
+        AND
+            QUJ.USER_ID = #{userId}
+        AND
+            QS.END_TIME > #{current}
+        AND
+            QQ.END_TIME > #{current}
     </select>
 
 </mapper>

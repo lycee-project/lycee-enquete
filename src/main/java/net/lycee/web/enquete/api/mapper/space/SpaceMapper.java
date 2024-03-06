@@ -1,5 +1,6 @@
 package net.lycee.web.enquete.api.mapper.space;
 
+import net.lycee.web.enquete.api.domain.UserId;
 import net.lycee.web.enquete.api.entity.SpaceEntity;
 import net.lycee.web.enquete.api.repository.space.QesSpace;
 import net.lycee.web.enquete.api.domain.SpaceId;
@@ -12,7 +13,7 @@ import java.util.List;
 public interface SpaceMapper {
 
     List<SpaceEntity> selectByUser(
-            @Param("userId") String userId,
+            @Param("userId") UserId userId,
             @Param("spaceId") SpaceId spaceId
     );
 
