@@ -55,6 +55,9 @@
             QAH.ANSWER_ID = QA.ANSWER_ID
         WHERE
             QQ.SPACE_ID = #{spaceId}
+        ORDER BY
+            QQ.QUESTION_NO ASC,
+            QA.ANSWER_NO ASC
     </select>
 
     <insert id="insert">
