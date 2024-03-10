@@ -1,12 +1,17 @@
 package net.lycee.web.enquete.config;
 
+import am.ik.yavi.factory.ValidatorFactory;
+import am.ik.yavi.message.MessageFormatter;
+import am.ik.yavi.message.MessageSourceMessageFormatter;
 import net.lycee.web.enquete.api.service.user.TokenService;
 import net.lycee.web.enquete.api.service.user.UserService;
 import net.lycee.web.enquete.interceptor.*;
 import net.lycee.web.enquete.utils.date.LyceeDate;
 import net.lycee.web.enquete.utils.date.LyceeDateFactory;
+import org.apache.logging.log4j.message.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -70,6 +75,12 @@ public class BeanConfig {
     public LyceeDate lyceeDate() {
         // FIXME: 暫定で日本時間で設定している，プロパティ化したい
         return new LyceeDate(ZoneOffset.ofHours(9));
+    }
+
+    @Bean
+    public ValidatorFactory yaviValidatorFactory(MessageSource messageSource) {
+        MessageFormatter messageFormatter = new MessageSourceMessageFormatter(messageSource::getMessage);
+        return new ValidatorFactory(".", messageFormatter);
     }
 
 }

@@ -1,31 +1,62 @@
 package net.lycee.web.enquete.api.controller.space;
 
+import am.ik.yavi.builder.ValidatorBuilder;
+import am.ik.yavi.core.ConstraintViolations;
+import am.ik.yavi.core.Validator;
+import am.ik.yavi.factory.ValidatorFactory;
+import am.ik.yavi.message.MessageSourceMessageFormatter;
+import net.lycee.web.enquete.exception.YaviValidationException;
 import net.lycee.web.enquete.interceptor.LyceeAuthorized;
 import net.lycee.web.enquete.api.service.space.SpaceService;
 import net.lycee.web.enquete.api.service.space.SpaceRegisterDto;
 import net.lycee.web.enquete.utils.LyceeConstants;
 import net.lycee.web.enquete.interceptor.RequestUser;
 import net.lycee.web.enquete.api.domain.SpaceId;
+import net.lycee.web.enquete.utils.date.LyceeDate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.function.Function;
 
 @RestController
 @RequestMapping("/api/space")
 @LyceeAuthorized
 public class SpaceController {
 
+    private Validator<SpacePostRequest> spacePostRequestValidator() {
+        return factory.validator(builder -> {
+            return builder
+                    .constraint(SpacePostRequest::getName, "name", it -> {
+                        return it.notNull()
+                                .greaterThanOrEqual(3)
+                                .lessThanOrEqual(100);
+                    })
+                    .constraint(SpacePostRequest::getCloseTime, "closeTime", it -> {
+                        return it.notNull()
+                                .greaterThan(lyceeDate.getMilliseconds()).message(
+                                        "{0}は未来日を設定してください"
+                                );
+                    });
+        });
+    }
+    private final ValidatorFactory factory;
     private final RequestUser requestUser;
+    private final LyceeDate lyceeDate;
 
     private final SpaceService spaceService;
 
     @Autowired
     public SpaceController(
+            ValidatorFactory factory,
             RequestUser user,
+            LyceeDate lyceeDate,
             SpaceService spaceService) {
+        this.factory = factory;
         this.requestUser = user;
+        this.lyceeDate = lyceeDate;
         this.spaceService = spaceService;
     }
 
@@ -74,12 +105,17 @@ public class SpaceController {
      */
     @PostMapping
     public ResponseEntity<SpacePostResponse> handlePost(
-            @RequestBody @Validated SpacePostRequest request
+            @RequestBody SpacePostRequest request
     ) {
+        ConstraintViolations violations = spacePostRequestValidator().validate(request);
+        if (!violations.isValid()) {
+            throw new YaviValidationException(violations);
+        }
+
         SpaceRegisterDto registerDto = new SpaceRegisterDto(
                 requestUser.getUserId(),
-                request.name,
-                request.closeTime
+                request.getName(),
+                request.getCloseTime()
         );
 
         SpaceId spaceId = spaceService.register(registerDto);
